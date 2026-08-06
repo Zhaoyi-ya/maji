@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 桌面 Widget 颜色：静态深色适配（values / values-night 各一套），绝不代码动态切 -->
+    <color name="widget_bg_color">#F2F4F7</color>
+    <!-- 卡片描边：浅色桌面勾出近白卡轮廓（根治边界不可见） -->
+    <color name="widget_card_stroke">#D8DCE3</color>
+    <color name="widget_title_color">#99000000</color>
+    <color name="widget_label_color">#FF606060</color>
+    <color name="widget_text_color">#FF1A1A1A</color>
+    <color name="widget_expense_color">#E94634</color>
+    <color name="widget_income_color">#2BA471</color>
+    <color name="widget_balance_color">#FF909090</color>
+    <color name="widget_accent_color">#3482FF</color>
+    <!-- 竖版 widget 标签圆点 -->
+    <color name="widget_dot_expense">#3482FF</color>
+    <color name="widget_dot_income">#7B61FF</color>
+    <!-- 右上角眼睛（隐藏/显示内容）图标 -->
+    <color name="widget_eye_color">#FF909090</color>
+</resources>

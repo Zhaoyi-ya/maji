@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 卡片：纵向偏上补偿（top=14/bottom=0/side=0，桌面 2×2 纵向区域偏上） -->
+    <FrameLayout
+        android:id="@android:id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/widget_top_margin"
+        android:layout_marginBottom="@dimen/widget_bottom_margin"
+        android:layout_marginStart="@dimen/widget_side_margin"
+        android:layout_marginEnd="@dimen/widget_side_margin"
+        android:background="@drawable/widget_bg"
+        android:padding="@dimen/widget_pad">
+
+        <LinearLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="top">
+
+            <!-- 顶部行：支出标签 + 右上角眼睛（隐藏/显示内容） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:src="@drawable/widget_dot_blue" />
+                    <TextView
+                        android:id="@+id/label_expense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="今日支出"
+                        android:textSize="11sp"
+                        android:textColor="@color/widget_label_color" />
+                </LinearLayout>
+                <ImageView
+                    android:id="@+id/eye_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/widget_eye_open"
+                    android:contentDescription="隐藏内容" />
+            </LinearLayout>
+
+            <!-- 支出金额（大） -->
+            <TextView
+                android:id="@+id/expense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_text_color" />
+
+            <!-- 收入标签 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/widget_dot_purple" />
+                <TextView
+                    android:id="@+id/label_income"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今日收入"
+                    android:textSize="11sp"
+                    android:textColor="@color/widget_label_color" />
+            </LinearLayout>
+
+            <!-- 收入金额（大） -->
+            <TextView
+                android:id="@+id/income"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/widget_text_color" />
+
+            <!-- 弹性空白：把查看账单推到左下角，数据组留在左上 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- 底部行：查看账单（左下角） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/view_bill"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="查看账单 >"
+                    android:textSize="11sp"
+                    android:textColor="@color/widget_accent_color" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 右下角 + 按钮（记一笔） -->
+        <TextView
+            android:id="@+id/add_btn"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:background="@drawable/widget_add_bg"
+            android:text="+"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFFFF" />
+    </FrameLayout>
+</FrameLayout>

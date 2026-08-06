@@ -1,0 +1,27 @@
+[package]
+name = "maji_core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "maji_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = "0.21"
+base64 = "0.22"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+android_logger = { version = "0.14", default-features = false }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "time"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
+webpki-roots = "1.0.6"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "unwind"
+strip = true

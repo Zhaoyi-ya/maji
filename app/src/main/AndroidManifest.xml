@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Android 16 实时更新（Live Update / 推广常驻通知）所需，安装期权限，低版本忽略 -->
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
+    <!-- 前台保活服务 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- 开机自启动：拉起主界面恢复核心后台初始化（小米需在安全中心授予自启动权限） -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+    </queries>
+
+    <application android:name=".MaJiApp"
+        android:allowBackup="true"
+        android:label="码记"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MaJi">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 超级岛通知的动作广播接收器（完成 / 划掉） -->
+        <receiver
+            android:name=".island.IslandActionReceiver"
+            android:exported="false" />
+
+        <!-- 通知识别监听服务：系统主动推送通知（MIUI/HyperOS 不拦截，进程被杀后系统自动重拉），
+             比短信广播可靠得多；需要在系统设置中手动授予「通知使用权」 -->
+        <service
+            android:name=".island.NotifListener"
+            android:label="码记·通认识别"
+            android:exported="false"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- 定时备份闹钟接收器（BackupScheduler 登记，后台静默执行备份） -->
+        <receiver
+            android:name=".bill.BackupScheduler$BackupAlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- 开机自启动接收器 -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 前台保活服务（开机/打开 App 后静默保活进程，不弹界面） -->
+        <service
+            android:name=".KeepAliveService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="保持 MiMo 连接与超级岛功能在开机后可用" />
+        </service>
+
+        <!-- Shizuku Provider -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <!-- 无障碍快捷方式服务 -->
+        <service
+            android:name=".island.VolumeShortcutAccessibilityService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/pickup_accessibility_service" />
+        </service>
+
+        <!-- 快捷磁贴：用户主动点击启动识别（冷启动最可靠的触发方式） -->
+        <service
+            android:name=".island.CaptureTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_island_notification"
+            android:label="码记识别"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- 截图识别前台服务 -->
+        <service
+            android:name=".island.ScreenCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection|specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="maji screenshot recognition" />
+        </service>
+
+        <!-- 截图桥接页 -->
+        <activity
+            android:name=".island.PermissionBridgeActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- 桌面收支 Widget（2×2，标准 Android AppWidgetProvider；独立进程 :widgetProvider 控内存） -->
+        <receiver
+            android:name=".widget.MiniWidgetProvider"
+            android:exported="true"
+            android:label="码记·收支"
+            android:process=":widgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="miui.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zhaoyi.maji.widget.TOGGLE_HIDE" />
+                <action android:name="com.zhaoyi.maji.widget.REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/maji_appwidget_info" />
+        </receiver>
+
+    </application>
+
+</manifest>

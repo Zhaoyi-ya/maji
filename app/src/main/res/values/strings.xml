@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_description">码记妙记岛快捷键，按下音量键组合实现快速扫描识别取件码，完成上岛等操作。不会读取任何页面内容。</string>
+    <string name="widget_desc">查看今日本周本月收支结余</string>
+    <string name="widget_title">码记·收支</string>
+</resources>

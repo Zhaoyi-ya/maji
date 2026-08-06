@@ -1,0 +1,46 @@
+{
+  "libraries": [
+    {
+      "uniqueId": "miuix",
+      "name": "Miuix",
+      "website": "https://github.com/compose-miuix-ui/miuix",
+      "licenses": ["Apache-2.0"]
+    },
+    {
+      "uniqueId": "miuix-skill",
+      "name": "miuix-skill",
+      "website": "https://github.com/limczhh/miuix-skill",
+      "licenses": ["未声明（见仓库 LICENSE）"]
+    },
+    {
+      "uniqueId": "beecount",
+      "name": "BeeCount",
+      "website": "https://github.com/TNT-Likely/BeeCount",
+      "licenses": ["自定义许可（见仓库 LICENSE）"]
+    },
+    {
+      "uniqueId": "kernelsu-style-ui-kit",
+      "name": "KernelSU-Style-UI-Kit",
+      "website": "https://github.com/chenaizhang/KernelSU-Style-UI-Kit",
+      "licenses": ["GPL-3.0"]
+    },
+    {
+      "uniqueId": "maling-island",
+      "name": "Maling-Island",
+      "website": "https://github.com/SiberiaApp/Maling-Island",
+      "licenses": ["AGPL-3.0"]
+    },
+    {
+      "uniqueId": "signaldock",
+      "name": "SignalDock",
+      "website": "https://github.com/jizizr/signaldock",
+      "licenses": ["GPL-3.0"]
+    },
+    {
+      "uniqueId": "androidliquidglass",
+      "name": "AndroidLiquidGlass",
+      "website": "https://github.com/Kyant0/AndroidLiquidGlass",
+      "licenses": ["Apache-2.0"]
+    }
+  ]
+}

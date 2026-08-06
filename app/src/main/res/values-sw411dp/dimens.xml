@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 非 2k 屏兜底（本机 sw384dp 不加载此目录）：外留边 + 内安全区 -->
+    <dimen name="widget_top_margin">14dp</dimen>
+    <dimen name="widget_bottom_margin">0dp</dimen>
+    <dimen name="widget_side_margin">0dp</dimen>
+    <dimen name="widget_pad">14dp</dimen>
+    <dimen name="widget_corner_radius">20dp</dimen>
+</resources>

@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <!-- 一个包裹 + 标签的剪影，用作状态栏小图标 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2.2 L20.5,6.6 L12,11 L3.5,6.6 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M2.8,8.1 L11.2,12.4 L11.2,21.6 L2.8,17.3 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12.8,12.4 L21.2,8.1 L21.2,17.3 L12.8,21.6 Z" />
+</vector>

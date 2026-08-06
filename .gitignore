@@ -1,0 +1,30 @@
+# ===== Gradle / 构建产物 =====
+.gradle/
+build/
+.kotlin/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ===== 本地配置 & 签名密钥（切勿提交） =====
+local.properties
+*.jks
+*.keystore
+
+# ===== IDE =====
+.idea/
+*.iml
+
+# ===== OS / 临时文件 =====
+.DS_Store
+Thumbs.db
+*.log
+
+# ===== Rust 原生模块构建产物（源码 rust/src 仍保留） =====
+rust/target/
+
+# ===== 运行时 / 测试残留数据库（可重建，可能含个人数据） =====
+cdb/
+cdb2/
+*.db
+*.db-shm
+*.db-wal

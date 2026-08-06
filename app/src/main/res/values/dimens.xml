@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 小米 Widget 尺寸表（技术规范 pId=1584 3.3）：2×2 = 110×110 dp -->
+    <dimen name="widget_min_width">110dp</dimen>
+    <dimen name="widget_min_height">110dp</dimen>
+
+    <!-- 桌面 2×2 纵向区域偏上（顶贴格子顶、底留一截），卡片顶部加 margin 收进、底部归零探底，整体下移补偿；横向已居中故 side 保持 0 -->
+    <dimen name="widget_top_margin">14dp</dimen>
+    <dimen name="widget_bottom_margin">0dp</dimen>
+    <dimen name="widget_side_margin">0dp</dimen>
+    <!-- 卡片内安全区（圆角内缩防裁切）；内容与边框留出足够距离，免贴边 -->
+    <dimen name="widget_pad">14dp</dimen>
+    <!-- 圆角半径：自绘卡片必须自带圆角；对齐 HyperOS 官方 2k 屏口径（73px/3.75≈20dp） -->
+    <dimen name="widget_corner_radius">20dp</dimen>
+</resources>
