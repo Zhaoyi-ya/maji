@@ -51,17 +51,6 @@
 - Android SDK（compileSdk 37）+ JDK 17
 - Rust 工具链（如需重新编译 `libmaji_core` 原生库；已编译产物 `app/src/main/jniLibs/arm64-v8a/libmaji_core.so` 可直接打包）
 
-Release 签名信息从项目根目录的 `local.properties` 读取（该文件已 gitignore，不会进入仓库）。在 `local.properties` 中补充：
-
-```
-KEYSTORE_FILE=D:/path/to/your.keystore
-KEYSTORE_PASSWORD=你的密钥库密码
-KEY_ALIAS=你的别名
-KEY_PASSWORD=你的密钥密码
-```
-
-未配置时仅编译不签名（不影响源码备份与 debug 构建）。
-
 构建产物：
 
 ```bash
