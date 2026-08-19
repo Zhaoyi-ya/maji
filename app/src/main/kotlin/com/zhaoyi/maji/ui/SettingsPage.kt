@@ -96,8 +96,7 @@ fun SettingsPage(
     islandMode: String = "xiaomi",
     onIslandModeChange: (String) -> Unit = {},
     onBackupSettingsClick: () -> Unit = {},
-    onNotifySettingsClick: () -> Unit = {},
-    onPromptSettingsClick: () -> Unit = {}
+    onNotifySettingsClick: () -> Unit = {}
 ) {
     val ctx = LocalContext.current
     val vm = viewModel<MainViewModel>()
@@ -389,11 +388,6 @@ fun SettingsPage(
                         title = "通认识别白名单",
                         summary = "命中关键词的通知自动提取取件码 / 自动记账",
                         onClick = onNotifySettingsClick
-                    )
-                    ArrowPreference(
-                        title = "大模型提示词",
-                        summary = "自定义发给大模型的识别指令，留空则用内置默认",
-                        onClick = onPromptSettingsClick
                     )
                 }
             }

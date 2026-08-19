@@ -3,6 +3,7 @@ package com.zhaoyi.maji.island
 import android.content.Context
 import android.util.Base64
 import com.zhaoyi.maji.data.AppDatabase
+import com.zhaoyi.maji.data.Categories
 import com.zhaoyi.maji.data.CodeKind
 import com.zhaoyi.maji.data.PickupCode
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +56,7 @@ object RecognitionPipeline {
                 })
                 put("max_tokens", 4096)
                 put("temperature", 0)
+                put("chat_template_kwargs", JSONObject().put("enable_thinking", false))
                 put("response_format", JSONObject().put("type", "json_object"))
             }
 
@@ -102,6 +104,7 @@ object RecognitionPipeline {
                 })
                 put("max_tokens", 4096)
                 put("temperature", 0)
+                put("chat_template_kwargs", JSONObject().put("enable_thinking", false))
                 put("response_format", JSONObject().put("type", "json_object"))
             }
 
@@ -109,7 +112,7 @@ object RecognitionPipeline {
             parseOrders(resp)
         }
 
-    private suspend fun post(apiUrl: String, apiKey: String, payload: JSONObject): String {
+    private suspend fun post(apiUrl: String, apiKey: String, payload: JSONObject, attempt: Int = 1): String {
         return try {
             val conn = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
@@ -126,9 +129,10 @@ object RecognitionPipeline {
             if (conn.responseCode !in 200..299) error("HTTP ${conn.responseCode}: ${body.take(500)}")
             body
         } catch (e: Exception) {
-            if (e.message?.contains("abort") == true) {
+            // 连接被中断（abort）时退避重试，但限制次数避免无限递归/栈溢出
+            if (e.message?.contains("abort") == true && attempt < 3) {
                 delay(1000)
-                post(apiUrl, apiKey, payload)
+                post(apiUrl, apiKey, payload, attempt + 1)
             } else throw e
         }
     }
@@ -140,7 +144,9 @@ object RecognitionPipeline {
             ?.optJSONObject("message")
             ?.optString("content")
             ?.trim()
-            ?.removeSurrounding("```json", "```")
+            ?.removePrefix("```json")
+            ?.removePrefix("```")
+            ?.removeSuffix("```")
             ?.trim()
             ?: response
 
@@ -210,12 +216,21 @@ object RecognitionPipeline {
         if (pureAmount.isNotBlank()) {
             val amt = pureAmount.toDoubleOrNull() ?: 0.0
             if (amt > 0) {
+                // 按模型返回的 type 区分收支：income=收入，其余（expense 或未指明）按支出处理
+                val tType = if (rType == "income") {
+                    com.zhaoyi.maji.data.TransactionType.INCOME
+                } else {
+                    com.zhaoyi.maji.data.TransactionType.EXPENSE
+                }
                 val note = listOf(item, brand, store).filter { it.isNotBlank() }
                     .joinToString(" · ").take(200)
+                // 校验分类是否落在当前收支对应的词表里，模型自造的分类回退到"其他"
+                val validCats = if (tType == com.zhaoyi.maji.data.TransactionType.INCOME) Categories.INCOME else Categories.EXPENSE
+                val safeCategory = if (category in validCats) category else "其他"
                 transactions.add(com.zhaoyi.maji.data.Transaction(
                     amount = amt,
-                    type = com.zhaoyi.maji.data.TransactionType.EXPENSE,
-                    category = category,
+                    type = tType,
+                    category = safeCategory,
                     note = note.ifBlank { null },
                     date = happenedAt,
                 ))
@@ -368,22 +383,16 @@ object RecognitionPipeline {
     }
 
     /**
-     * 读取提示词：优先用用户在设置里自定义的（recognition 偏好 user_prompt）；
-     * 用户未设置或清空保存后，回退到代码内置的 [DEFAULT_PROMPT]。
+     * 提示词已固定为代码内置的 [DEFAULT_PROMPT]，不再支持用户在设置里自定义覆盖。
      */
-    internal fun loadPrompt(context: Context): String {
-        val prefs = context.getSharedPreferences("recognition", Context.MODE_PRIVATE)
-        val user = prefs.getString("user_prompt", null)
-        if (!user.isNullOrBlank()) return user
-        return DEFAULT_PROMPT
-    }
+    internal fun loadPrompt(context: Context): String = DEFAULT_PROMPT
 
     /**
-     * 内置默认提示词（代码常量，作为用户未自定义时的兜底）。
+     * 内置提示词（代码常量，全局固定使用，不再支持用户自定义覆盖）。
      * 重点约束了"什么不是金额"——快递柜号、重量、时长、条件费率、电话号等数字
      * 不得当作 orderAmount，避免纯取件通知被误记成账单。
      */
-    const val DEFAULT_PROMPT = """你是订单与账单信息提取引擎。输入可能是截图，或一段通知/短信文本。请从中提取订单、取件码与"已发生的"资金变动，输出严格受控的 JSON。
+    val DEFAULT_PROMPT = """你是订单与账单信息提取引擎。输入可能是截图，或一段通知/短信文本。请从中提取订单、取件码与"已发生的"资金变动，输出严格受控的 JSON。
 
 最高优先级规则（不可违反）：
 1. 仅输出纯 JSON。禁止 Markdown、代码块、解释文字。
@@ -395,20 +404,22 @@ object RecognitionPipeline {
 {"orders":[{"type":"meal","pickupCode":"","brandName":"","storeName":"","orderAmount":"","itemName":"","category":"","date":"","time":""}]}
 
 字段规则：
-- type: meal=取餐 / express=快递柜入柜取件 / expense=真实记账 / none=无关
+- type: meal=取餐 / express=快递柜入柜取件 / expense=真实支出（付款/扣款/消费） / income=真实收入（工资/退款/收款/到账） / none=无关
 - pickupCode: 取餐码/取件码（去除"取餐码""取件码"等前缀词，如"取餐码 A888"→"A888"）
 - brandName: 品牌名（喜茶、瑞幸、圆通、京东等；无法确认返回""）
 - storeName: 门店/驿站名（仅门店名，去掉品牌前缀）
 - orderAmount: 仅当"已经发生的资金变动"才填写，格式含符号如 "¥156.40"；纯取件无付款则留空 ""
 - itemName: 商品名（取第一个）
-- category: 记账分类（餐饮/交通/购物/居家/娱乐/医疗/服饰/日用/其他）
+- category: 记账分类，必须严格从下列词表里选一个，不要自造；无法归类填"其他"：
+  - type=expense → ${Categories.EXPENSE.joinToString(" / ")}
+  - type=income  → ${Categories.INCOME.joinToString(" / ")}
 - date: 该笔记录自身显示的日期（如 2026-08-01 或 8月1日）；星期几换算本周日期；今天/昨天/前天同理；禁止用当前日期占位，也禁止留空
 - time: 该笔记录自身显示的时间（如 16:30）
 
 判断逻辑：
 有取餐码 → type=meal
 有取件码+快递关键词 → type=express
-有金额+无取码 → type=expense
+有金额+无取码 → type=expense（支出）或 income（收入），按资金实际方向判断：付款/扣款/消费=expense，收款/到账/退款/工资=income
 都不相关 → 该 order 的 type=none（字段返回""），不要编造
 
 【严禁把以下内容当作 orderAmount】（这些是数字，但不是金额）：
@@ -429,7 +440,10 @@ object RecognitionPipeline {
 → {"orders":[{"type":"express","pickupCode":"3344 5566","brandName":"中通快递","storeName":"龙湖天街 2 号柜","orderAmount":"","itemName":"","category":"","date":"","time":""}]}
 
 微信支付：您向XX付款 ¥156.40
-→ {"orders":[{"type":"expense","pickupCode":"","brandName":"微信支付","storeName":"","orderAmount":"¥156.40","itemName":"","category":"其他","date":"","time":""}]}"""
+→ {"orders":[{"type":"expense","pickupCode":"","brandName":"微信支付","storeName":"","orderAmount":"¥156.40","itemName":"","category":"其他","date":"","time":""}]}
+
+支付宝：您收到一笔转账 ¥2000.00
+→ {"orders":[{"type":"income","pickupCode":"","brandName":"支付宝","storeName":"","orderAmount":"¥2000.00","itemName":"","category":"其他","date":"","time":""}]}"""
 }
 
 data class RecognizedData(

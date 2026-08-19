@@ -70,7 +70,6 @@ private data object ScreenLicense : ScreenRoute
 private data object ScreenPermissionCheck : ScreenRoute
 private data object ScreenBackupSettings : ScreenRoute
 private data object ScreenNotifySettings : ScreenRoute
-private data object ScreenPromptSettings : ScreenRoute
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
@@ -193,9 +192,6 @@ fun MainScreen(
     val popNotifySettings: () -> Unit = {
         if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
     }
-    val popPromptSettings: () -> Unit = {
-        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
-    }
 
     NavDisplay(
         backStack = backStack,
@@ -209,7 +205,6 @@ fun MainScreen(
                 backStack.size > 1 && backStack.last() is ScreenPermissionCheck -> popPermissionCheck()
                 backStack.size > 1 && backStack.last() is ScreenBackupSettings -> popBackupSettings()
                 backStack.size > 1 && backStack.last() is ScreenNotifySettings -> popNotifySettings()
-                backStack.size > 1 && backStack.last() is ScreenPromptSettings -> popPromptSettings()
                 else -> (context as? android.app.Activity)?.finish()
             }
         },
@@ -570,7 +565,6 @@ fun MainScreen(
                     onIslandModeChange = onIslandModeChange,
                     onBackupSettingsClick = { backStack.add(ScreenBackupSettings) },
                     onNotifySettingsClick = { backStack.add(ScreenNotifySettings) },
-                    onPromptSettingsClick = { backStack.add(ScreenPromptSettings) },
                 )
             }
             ScreenBackupSettings -> NavEntry(route) {
@@ -583,13 +577,6 @@ fun MainScreen(
             ScreenNotifySettings -> NavEntry(route) {
                 NotifySettingsPage(
                     onBack = popNotifySettings,
-                    enableBlur = enableBlur,
-                    blurStyle = blurStyle,
-                )
-            }
-            ScreenPromptSettings -> NavEntry(route) {
-                PromptSettingsPage(
-                    onBack = popPromptSettings,
                     enableBlur = enableBlur,
                     blurStyle = blurStyle,
                 )

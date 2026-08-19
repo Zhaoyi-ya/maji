@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.zhaoyi.maji.data.Categories
 import com.zhaoyi.maji.data.Transaction
 import com.zhaoyi.maji.data.TransactionType
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -49,10 +50,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-private val EXPENSE_CATEGORIES = listOf("餐饮", "交通", "购物", "居家", "娱乐", "医疗", "通讯", "转账", "其他")
-private val INCOME_CATEGORIES = listOf("转账收款", "工资", "红包", "理财收益", "其他")
 private fun categoriesFor(type: TransactionType) =
-    if (type == TransactionType.EXPENSE) EXPENSE_CATEGORIES else INCOME_CATEGORIES
+    if (type == TransactionType.EXPENSE) Categories.EXPENSE else Categories.INCOME
 
 private const val DATE_PICKER_DAY_RANGE = 20000 // about ±55 years
 
@@ -119,7 +118,8 @@ fun AddTransactionDialog(
             if (editing != null) {
                 amountText = if (editing.amount % 1.0 == 0.0) editing.amount.toInt().toString() else editing.amount.toString()
                 type = editing.type
-                categoryIndex = categoriesFor(type).indexOf(editing.category).coerceAtLeast(0)
+                val cats = categoriesFor(type)
+                categoryIndex = cats.indexOf(editing.category).let { if (it < 0) cats.indexOf("其他").coerceAtLeast(0) else it }
                 note = editing.note ?: ""
                 date = editing.date
                 imagePaths.clear()

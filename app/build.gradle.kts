@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -17,7 +18,7 @@ android {
         applicationId = "com.zhaoyi.maji"
         minSdk = 33
         targetSdk = 37
-        versionCode = 47
+        versionCode = 48
         versionName = "2.0-next"
         buildConfigField("String", "BUILD_DATE", "\"2026-06-19\"")
     }
@@ -31,7 +32,7 @@ android {
             //   KEY_ALIAS=zhaoyi.tools
             //   KEY_PASSWORD=你的密钥密码
             // 若本地未配置，则 release 仅编译不签名（不影响源码备份与 debug 构建）。
-            val props = java.util.Properties()
+            val props = Properties()
             val propsFile = rootProject.file("local.properties")
             if (propsFile.exists()) {
                 propsFile.inputStream().use { props.load(it) }
